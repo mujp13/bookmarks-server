@@ -18,12 +18,12 @@ const serializeBookmark = bookmark => ({
 // GET /bookmarks returns a list of bookmarks
 bookmarksRouter
   .route('/bookmarks')
-  .get((req, res) => {
+  .get((req, res, next) => {
     BookmarksService.getAllBookmarks(req.app.get('db'))
       .then(bookmarks => {
         res.json(bookmarks.map(serializeBookmark))
       })
-      .catch(text)
+      .catch(next)
   })
 
 bookmarksRouter
