@@ -23,6 +23,7 @@ function makeBookmarksArray() {
     },
   ]
 }
+
 function makeMaliciousBookmark() {
   const maliciousBookmark = {
     id: 911,
@@ -44,5 +45,5 @@ function makeMaliciousBookmark() {
 
 module.exports = {
   makeBookmarksArray,
-  makeMaliciousBookmark,
+  makeMaliciousBookmark
 }
