@@ -202,7 +202,8 @@ describe('Bookmarks Endpoints', () => {
         const bookmarkId = 123456
         return supertest(app)
           .patch(`/api/bookmarks/${bookmarkId}`)
-          .expect(404, { error: { message: `Bookmark doesn't exist` } })
+          .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+          .expect(404, { error: { message: `Bookmark Not Found` } })
       })
     })
 
@@ -221,6 +222,7 @@ describe('Bookmarks Endpoints', () => {
           title: 'updated bookmark title',
           url: 'updated bookmark url',
           description: 'updated bookmark description',
+          rating: 'updated rating'
         }
         const expectedBookmark = {
           ...testBookmarks[idToUpdate - 1],
@@ -229,6 +231,7 @@ describe('Bookmarks Endpoints', () => {
         return supertest(app)
           .patch(`/api/bookmarks/${idToUpdate}`)
           .send(updateBookmark)
+          .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
           .expect(204)
           .then(res =>
             supertest(app)
