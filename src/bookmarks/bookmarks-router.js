@@ -28,7 +28,6 @@ bookmarksRouter
   .post(bodyParser, (req, res, next) => {
     for (const field of ['title', 'url', 'rating']) {
       if (!req.body[field]) {
-        logger.error(`${field} is required`)
         return res.status(400).send({
           error: { message: `'${field}' is required` }
         })
@@ -54,7 +53,7 @@ bookmarksRouter
     }
 
     const newBookmark = { title, url, description, rating }
-
+    console.log(newBookmark)
     BookmarksService.insertBookmark(
       req.app.get('db'),
       newBookmark
@@ -63,20 +62,24 @@ bookmarksRouter
         logger.info(`Bookmark with id ${bookmark.id} created.`)
         res
           .status(201)
-          .location(path.posix.join(req.originalUrl, `/${article.id}`))
+          .location(path.posix.join(req.originalUrl, `/${bookmark.id}`))
           .json(serializeBookmark(bookmark))
       })
-      .catch(next)
+      .catch((err) => {
+        console.log(err);
+        next();
+      })
   })
 
 bookmarksRouter
   .route('/:bookmark_id')
-  .all((req, res, next) => {
-    const { bookmark_id } = req.params
-    BookmarksService.getById(req.app.get('db'), bookmark_id)
+  .all((req, res, next) => {    
+    BookmarksService.getById(
+      req.app.get('db'), 
+      req.params.bookmark_id
+    )
       .then(bookmark => {
         if (!bookmark) {
-          logger.error(`Bookmark with id ${bookmark_id} not found.`)
           return res.status(404).json({
             error: { message: `Bookmark Not Found` }
           })
@@ -97,6 +100,20 @@ bookmarksRouter
     )
       .then(numRowsAffected => {
         logger.info(`Bookmark with id ${bookmark_id} deleted.`)
+        res.status(204).end()
+      })
+      .catch(next)
+  })
+  .patch(bodyParser, (req, res, next) => {
+    const { title, url, description } = req.body
+    const bookmarkToUpdate = { title, url, description }
+    
+    BookmarksService.updateBookmark(
+      req.app.get('db'),
+      req.params.bookmark_id,
+      bookmarkToUpdate
+    )
+      .then(numRowsAffected => {
         res.status(204).end()
       })
       .catch(next)
